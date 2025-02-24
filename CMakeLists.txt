@@ -6,7 +6,19 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-find_package(Boost REQUIRED COMPONENTS system filesystem locale)
+set(BOOST_ROOT "E:/UEBuilder/lib")
+set(BOOST_INCLUDEDIR "${BOOST_ROOT}/include")
+set(BOOST_LIBRARYDIR "${BOOST_ROOT}/lib")
+
+# Подключаем Boost
+find_package(Boost REQUIRED locale)
+
+if(Boost_FOUND)
+    include_directories(${Boost_INCLUDE_DIRS})
+    link_directories(${Boost_LIBRARY_DIRS})
+else()
+    message(FATAL_ERROR "Boost not found!")
+endif()
 
 find_package(Qt6 COMPONENTS
         Core
@@ -25,7 +37,7 @@ target_link_libraries(UEBuilder
         Qt::Core
         Qt::Gui
         Qt::Widgets
-        ${Boost_LIBRARIES}
+        Boost::locale
 )
 
 if (WIN32 AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
