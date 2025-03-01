@@ -35,5 +35,4 @@ private:
     QProcess *process;
 };
 
-
 #endif //UEBUILDER_MAINWINDOW_H

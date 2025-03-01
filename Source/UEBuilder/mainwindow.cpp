@@ -8,7 +8,7 @@
 #include "ui_MainWindow.h"
 #include <QProcess>
 #include <QStringDecoder>
-#include <boost/locale.hpp>
+#include <boost/boost/locale.hpp>
 
 MainWindow::MainWindow(QWidget *parent) :
         QMainWindow(parent), ui(new Ui::MainWindow) {

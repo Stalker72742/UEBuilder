@@ -6,24 +6,19 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
+if(POLICY CMP0167)
+    cmake_policy(SET CMP0167 NEW)
+endif()
+
 set(PROJECT_ROOT ${CMAKE_SOURCE_DIR})
 
-if(NOT DEFINED BOOST_ROOT)
-    set(BOOST_ROOT "${PROJECT_ROOT}/lib")
-endif()
+set(BOOST_ROOT "${CMAKE_SOURCE_DIR}/boost")
+set(BOOST_INCLUDEDIR "${CMAKE_SOURCE_DIR}/boost/boost")
+set(BOOST_LIBRARYDIR "${CMAKE_SOURCE_DIR}/boost/lib")
 
-set(BOOST_INCLUDEDIR "${BOOST_ROOT}/include")
-set(BOOST_LIBRARYDIR "${BOOST_ROOT}/lib")
+find_package(Boost 1.87 COMPONENTS locale REQUIRED)
 
-# Подключаем Boost
-find_package(Boost REQUIRED locale)
-
-if(Boost_FOUND)
-    include_directories(${Boost_INCLUDE_DIRS})
-    link_directories(${Boost_LIBRARY_DIRS})
-else()
-    message(FATAL_ERROR "Boost not found!")
-endif()
+include_directories("${PROJECT_ROOT}/boost")
 
 find_package(Qt6 COMPONENTS
         Core
@@ -36,13 +31,11 @@ add_executable(UEBuilder main.cpp
         Source/UEBuilder/mainwindow.h
         Source/UEBuilder/mainwindow.ui)
 
-target_include_directories(UEBuilder PRIVATE ${Boost_INCLUDE_DIRS})
-
 target_link_libraries(UEBuilder
         Qt::Core
         Qt::Gui
         Qt::Widgets
-        Boost::locale
+        ${Boost_LIBRARIES}
 )
 
 if (WIN32 AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
