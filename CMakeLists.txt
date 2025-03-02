@@ -12,13 +12,13 @@ endif()
 
 set(PROJECT_ROOT ${CMAKE_SOURCE_DIR})
 
-set(BOOST_ROOT "${CMAKE_SOURCE_DIR}/boost")
-set(BOOST_INCLUDEDIR "${CMAKE_SOURCE_DIR}/boost/boost")
-set(BOOST_LIBRARYDIR "${CMAKE_SOURCE_DIR}/boost/lib")
+set(BOOST_ROOT "${CMAKE_SOURCE_DIR}/source/Libs/Boost")
+set(BOOST_INCLUDEDIR "${BOOST_ROOT}/include")
+set(BOOST_LIBRARYDIR "${BOOST_ROOT}/lib")
 
 find_package(Boost 1.87 COMPONENTS locale REQUIRED)
 
-include_directories("${PROJECT_ROOT}/boost")
+include_directories("${BOOST_INCLUDEDIR}/boost-1_87")
 
 find_package(Qt6 COMPONENTS
         Core
@@ -29,7 +29,10 @@ find_package(Qt6 COMPONENTS
 add_executable(UEBuilder main.cpp
         Source/UEBuilder/mainwindow.cpp
         Source/UEBuilder/mainwindow.h
-        Source/UEBuilder/mainwindow.ui)
+        Source/UEBuilder/mainwindow.ui
+        source/UEBuilder/Widgets/TitleBar/customtitlebar.cpp
+        source/UEBuilder/Widgets/TitleBar/customtitlebar.h
+        source/UEBuilder/Widgets/TitleBar/customtitlebar.ui)
 
 target_link_libraries(UEBuilder
         Qt::Core

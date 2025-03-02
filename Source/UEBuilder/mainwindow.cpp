@@ -2,29 +2,36 @@
 // Created by Stalker7274 on 23.02.2025.
 //
 
-// You may need to build the project (run Qt uic code generator) to get "ui_MainWindow.h" resolved
-
 #include "mainwindow.h"
 #include "ui_MainWindow.h"
+#include "Widgets/TitleBar/customtitlebar.h"
 #include <QProcess>
 #include <QStringDecoder>
-#include <boost/boost/locale.hpp>
+#include <Boost/include/boost-1_87/boost/locale.hpp>
+#include <QLabel>
 
 MainWindow::MainWindow(QWidget *parent) :
         QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
 
-    setAutoFillBackground(true);
+    setWindowFlags(Qt::FramelessWindowHint);
 
-    setStyleSheet("background-color: black;");
+    CustomTitleBar* titleBar = new CustomTitleBar(this);
+
+    setMenuWidget(titleBar);
+
+    connect(titleBar, &CustomTitleBar::minimizeClicked, this, &MainWindow::showMinimized);
+    connect(titleBar, &CustomTitleBar::closeClicked, this, &MainWindow::close);
+
+    setAutoFillBackground(true);
 
     //ui->horizontalLayoutWidget->setStyleSheet("background-color: black;");
 
     ui->Build->setStyleSheet("background-color: transparent; border: none; color: white;");
-    //ui->pushButton_2->setStyleSheet("background-color: transparent; border: none; color: white;");
-    //ui->pushButton_3->setStyleSheet("background-color: transparent; border: none; color: white;");
+    ui->Rebuild->setStyleSheet("background-color: transparent; border: none; color: white;");
+    ui->Update->setStyleSheet("background-color: transparent; border: none; color: white;");
 
-    ui->outputEdit->setStyleSheet("background-color: white;");
+    ui->OutputLog->setStyleSheet("background-color: white;");
 
     process = new QProcess(this);
 
@@ -33,6 +40,19 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(process, &QProcess::readyReadStandardError, this, &MainWindow::readError);
     connect(process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
            this, &MainWindow::onFinished);
+
+    QWidget *contentWidget1 = new QWidget;
+    QVBoxLayout *contentLayout = new QVBoxLayout(contentWidget1);
+
+
+    for (int i = 1; i <= 20; ++i) {
+        QLabel *label = new QLabel(QString("Элемент %1").arg(i));
+        contentLayout->addWidget(label);
+        label->setStyleSheet("color: white");
+    }
+    contentWidget1->setLayout(contentLayout);
+
+    ui->scrollArea->setWidget(contentWidget1);
 }
 
 MainWindow::~MainWindow() {
@@ -42,7 +62,7 @@ MainWindow::~MainWindow() {
 
 void MainWindow::onBuildClicked()
 {
-    ui->outputEdit->clear();
+    ui->OutputLog->clear();
 
     QString program = "C:/Program Files/Epic Games/UE_5.4/Engine/Build/BatchFiles/Build.bat";
     QStringList arguments;
@@ -67,16 +87,15 @@ void MainWindow::readOutput() {
         //std::cerr << "Ошибка конвертации: " << e.what() << std::endl;
     }
 
-    ui->outputEdit->appendPlainText(Text);
+    ui->OutputLog->appendPlainText(Text);
 }
 
 void MainWindow::readError() {
     QByteArray data = process->readAllStandardError();
-    ui->outputEdit->appendPlainText(QString::fromUtf8(data));
+    ui->OutputLog->appendPlainText(QString::fromUtf8(data));
 }
 
 void MainWindow::onFinished(int exitCode, QProcess::ExitStatus exitStatus) {
     Q_UNUSED(exitCode)
     Q_UNUSED(exitStatus)
-    ui->outputEdit->appendPlainText("Команда завершена.");
 }
