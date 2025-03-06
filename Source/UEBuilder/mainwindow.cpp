@@ -9,6 +9,7 @@
 #include <QStringDecoder>
 #include <Boost/include/boost-1_87/boost/locale.hpp>
 #include <QLabel>
+#include "FileFinder/FileFinder.h"
 
 MainWindow::MainWindow(QWidget *parent) :
         QMainWindow(parent), ui(new Ui::MainWindow) {
@@ -31,11 +32,12 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->Rebuild->setStyleSheet("background-color: transparent; border: none; color: white;");
     ui->Update->setStyleSheet("background-color: transparent; border: none; color: white;");
 
-    ui->OutputLog->setStyleSheet("background-color: white;");
+    ui->OutputLog->setStyleSheet("background-color: black; border: white; color: white");
 
     process = new QProcess(this);
 
     connect(ui->Build, &QPushButton::clicked, this, &MainWindow::onBuildClicked);
+    connect(ui->Update, &QPushButton::clicked, this, &MainWindow::onUpdateClicked);
     connect(process, &QProcess::readyReadStandardOutput, this, &MainWindow::readOutput);
     connect(process, &QProcess::readyReadStandardError, this, &MainWindow::readError);
     connect(process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
@@ -64,11 +66,18 @@ void MainWindow::onBuildClicked()
 {
     ui->OutputLog->clear();
 
-    QString program = "C:/Program Files/Epic Games/UE_5.4/Engine/Build/BatchFiles/Build.bat";
+    QString program = "U:/Engines/UE_5.4/Engine/Build/BatchFiles/Build.bat";
     QStringList arguments;
-    arguments <<"DoomEditor" << "Win64" << "Development" << "-project=D:/UE_Projects/Doom/Doom.uproject";
+    arguments <<"DoomEditor" << "Win64" << "Development" << "-project=U:/UE_Projects/Doom/Doom.uproject";
     process->start(program, arguments);
 }
+
+void MainWindow::onUpdateClicked() {
+
+    FileScannerThread *scannerThread = new FileScannerThread(QStringList{"UnrealEditor.exe"});
+    scannerThread->start();
+}
+
 
 void MainWindow::readOutput() {
 

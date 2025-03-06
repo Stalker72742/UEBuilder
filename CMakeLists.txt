@@ -24,6 +24,7 @@ find_package(Qt6 COMPONENTS
         Core
         Gui
         Widgets
+        Concurrent
         REQUIRED)
 
 add_executable(UEBuilder main.cpp
@@ -32,12 +33,14 @@ add_executable(UEBuilder main.cpp
         Source/UEBuilder/mainwindow.ui
         source/UEBuilder/Widgets/TitleBar/customtitlebar.cpp
         source/UEBuilder/Widgets/TitleBar/customtitlebar.h
-        source/UEBuilder/Widgets/TitleBar/customtitlebar.ui)
+        source/UEBuilder/Widgets/TitleBar/customtitlebar.ui
+        source/UEBuilder/FileFinder/FileFinder.cpp)
 
 target_link_libraries(UEBuilder
         Qt::Core
         Qt::Gui
         Qt::Widgets
+        Qt::Concurrent
         ${Boost_LIBRARIES}
 )
 

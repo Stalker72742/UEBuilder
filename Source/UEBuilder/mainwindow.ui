@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>974</width>
+    <width>982</width>
     <height>628</height>
    </rect>
   </property>
@@ -48,6 +48,9 @@
        <spacer name="horizontalSpacer">
         <property name="orientation">
          <enum>Qt::Orientation::Horizontal</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Policy::Fixed</enum>
         </property>
         <property name="sizeHint" stdset="0">
          <size>
@@ -109,25 +112,6 @@
        </spacer>
       </item>
       <item>
-       <widget class="QPushButton" name="Rebuild">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>215</width>
-          <height>64</height>
-         </size>
-        </property>
-        <property name="text">
-         <string>Rebuild</string>
-        </property>
-       </widget>
-      </item>
-      <item>
        <widget class="QPushButton" name="Build">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
@@ -149,6 +133,25 @@
         </property>
         <property name="text">
          <string>Build</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="Rebuild">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>215</width>
+          <height>64</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Rebuild</string>
         </property>
        </widget>
       </item>
@@ -239,7 +242,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>974</width>
+     <width>982</width>
      <height>22</height>
     </rect>
    </property>

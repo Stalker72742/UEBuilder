@@ -23,6 +23,8 @@ public:
 
     void onBuildClicked();
 
+    void onUpdateClicked();
+
     void readOutput();
 
     void readError();
