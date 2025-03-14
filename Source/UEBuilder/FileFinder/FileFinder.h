@@ -23,15 +23,15 @@ public:
 
     void Scan(const QStringList &extensions, FindType LFindType = FileName);
 
-    void StartScan(const QStringList &extensions);
-
 private:
 
     QSettings *settings;
 
-    FindType FindType;
+    FindType FindType = FileName;
 
     void scanDirectory(const QString &path, const QStringList &extensions);
+
+    void SetupConfig();
 };
 
 class FileScannerWorker : public QObject

@@ -7,7 +7,10 @@
 
 #include <QMainWindow>
 #include <QProcess>
-
+#include "FileFinder/GrokFileSearcher.h"
+#include "FileFinder/FinderStructs.h"
+#include <QProxyStyle>
+#include <QStyleOptionComplex>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -31,10 +34,34 @@ public:
 
     void onFinished(int exitCode, QProcess::ExitStatus exitStatus);
 
+    void executeInMainThread(std::function<void()> callback);
+
+    void OnProjectClicked();
+
 private:
+
+    void UpdateScrollBox();
+
     Ui::MainWindow *ui;
 
     QProcess *process;
+
+    FileSearcher Searher;
+
+    QVector<UProject> UProjects;
+};
+
+class TransparentScrollBarStyle : public QProxyStyle {
+public:
+    void drawComplexControl(QStyle::ComplexControl control, const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget) const override {
+        if (control == QStyle::CC_ScrollBar) {
+            QStyleOptionComplex opt(*option);
+            opt.palette.setColor(QPalette::Window, Qt::transparent);
+            QProxyStyle::drawComplexControl(control, &opt, painter, widget);
+        } else {
+            QProxyStyle::drawComplexControl(control, option, painter, widget);
+        }
+    }
 };
 
 #endif //UEBUILDER_MAINWINDOW_H

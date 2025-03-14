@@ -6,30 +6,41 @@
 #include <QStandardPaths>
 #include <QDirIterator>
 #include <QStorageInfo>
-#include <QtConcurrent/QtConcurrent>
 #include <QFuture>
 
 FileFinder::FileFinder(QObject *parent) : QObject(parent) {
 
     QString configDir = QCoreApplication::applicationDirPath() + "/Configs";
-    QDir().mkpath(configDir);  // Создаём папку, если её нет
+    QDir().mkpath(configDir);
 
     QString configPath = configDir + "/FoundedFiles.ini";
     settings = new QSettings(configPath, QSettings::IniFormat, this);
 
     if (!QFile::exists(configPath)) {
-        qWarning() << "File do not create automaticly";
-    } else {
-        qDebug() << "Config creating: " << configPath;
-    }
 
-    QFile configFile(QCoreApplication::applicationDirPath() + "/Configs/FoundedFiles.ini");
-    if (!configFile.open(QIODevice::WriteOnly | QIODevice::Append)) {
-        qWarning() << "Access denied";
+        qWarning() << "Config does not exist. Creating...";
+
+        SetupConfig();
     } else {
-        qDebug() << "Can write";
-        configFile.close();
+        qDebug() << "Config exist." << configPath;
     }
+}
+
+void FileFinder::SetupConfig()
+{
+    QFile configFile(QCoreApplication::applicationDirPath() + "/Configs/FoundedFiles.ini");
+
+    settings->beginGroup("Find settings");
+    settings->remove("");
+
+    QStringList Paths  = {"c:", "d:","e:"};
+
+    settings->setValue("FindIgnore", Paths);
+
+    settings->endGroup();
+    settings->sync();
+
+    qDebug() << "Config crated and has default find settings";
 }
 
 void FileFinder::Scan(const QStringList &extensions, enum FindType LFindType)
@@ -70,38 +81,23 @@ void FileFinder::scanDirectory(const QString &path, const QStringList &extension
         QString fileName = it.fileName();
         QString fileExtension = QFileInfo(filePath).suffix().toLower();
 
-
         if(!filePath.contains("U:")){
             break;
         }
 
-        if (filePath.contains("Binaries")){
-
-            /*QMutex mutex;
-
-            mutex.lock();
-            qDebug() << "Current folder: " << filePath;
-            mutex.unlock();*/
-
-            switch (FindType) {
-                case FileName:
-                    if (extensions.isEmpty() || extensions.contains(fileName)) {
-                        settings->setValue(fileName, filePath);
-                        settings->sync();
-                    }
-                    break;
-                case Extention:
-                    if (extensions.isEmpty() || extensions.contains(fileExtension)) {
-                        settings->setValue(fileName, filePath);
-                        settings->sync();
-                    }
-                    break;
-            }
+        switch (FindType) {
+            case FileName:
+                if (extensions.isEmpty() || extensions.contains(fileName)) {
+                    settings->setValue(fileName, filePath);
+                    settings->sync();
+                }
+                break;
+            case Extention:
+                if (extensions.isEmpty() || extensions.contains(fileExtension)) {
+                    settings->setValue(fileName, filePath);
+                    settings->sync();
+                }
+                break;
         }
     }
-}
-
-void FileFinder::StartScan(const QStringList &extensions) {
-
-    //QFuture<void> future = QtConcurrent::run(this, &FileFinder::Scan, extensions);
 }

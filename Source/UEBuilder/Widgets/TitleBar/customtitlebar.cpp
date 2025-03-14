@@ -7,6 +7,7 @@
 #include <QHBoxLayout>
 #include <QPushButton>
 #include <QMouseEvent>
+#include <QFrame>
 #include "customtitlebar.h"
 #include "ui_CustomTitleBar.h"
 
@@ -16,22 +17,29 @@ CustomTitleBar::CustomTitleBar(QWidget *parent) :
         {
     ui->setupUi(this);
 
-    setFixedHeight(30);
-
-    //setStyleSheet("background-color: #3498db; color: white;");
-
     QHBoxLayout *layout = new QHBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
 
-    // Растяжка для сдвига кнопки вправо
-    layout->addStretch();
+    titleLabel = new QLabel("Custom Window Title", this);
+    titleLabel->setStyleSheet("padding: 5px; color: white; background: transparent");
 
     QPushButton *CloseButton = new QPushButton("X", this);
-    layout->addWidget(CloseButton);
 
-    //connect(ui->minimizeButton, &QPushButton::clicked, this, &CustomTitleBar::minimizeClicked);
+    QPushButton *minimizeButton = new QPushButton("🗕", this);
+
+            ui->horizontalLayout->addWidget(titleLabel);
+            ui->horizontalLayout->addStretch();
+            ui->horizontalLayout->addWidget(minimizeButton);
+            ui->horizontalLayout->addWidget(CloseButton);
+
+    CloseButton->setStyleSheet("color: #a8a8a8");
+
     connect(CloseButton, &QPushButton::clicked, this, &CustomTitleBar::closeClicked);
+
+
+    setFixedHeight(30);
+    setStyleSheet("background-color: #2d2d2d;");
 }
 
 CustomTitleBar::~CustomTitleBar()

@@ -34,7 +34,14 @@ add_executable(UEBuilder main.cpp
         source/UEBuilder/Widgets/TitleBar/customtitlebar.cpp
         source/UEBuilder/Widgets/TitleBar/customtitlebar.h
         source/UEBuilder/Widgets/TitleBar/customtitlebar.ui
-        source/UEBuilder/FileFinder/FileFinder.cpp)
+        source/UEBuilder/FileFinder/FileFinder.cpp
+        source/UEBuilder/FileFinder/GrokFileSearcher.cpp
+        source/UEBuilder/FileFinder/GrokFileSearcher.h
+        source/UEBuilder/FileFinder/FinderStructs.h
+        source/UEBuilder/Widgets/custombutton.cpp
+        source/UEBuilder/Widgets/custombutton.h
+        source/UEBuilder/Widgets/custombutton.ui
+)
 
 target_link_libraries(UEBuilder
         Qt::Core

@@ -8,8 +8,10 @@
 #include <QProcess>
 #include <QStringDecoder>
 #include <Boost/include/boost-1_87/boost/locale.hpp>
-#include <QLabel>
 #include "FileFinder/FileFinder.h"
+#include "FileFinder/GrokFileSearcher.h"
+#include "Widgets/custombutton.h"
+#include <QScrollBar>
 
 MainWindow::MainWindow(QWidget *parent) :
         QMainWindow(parent), ui(new Ui::MainWindow) {
@@ -43,18 +45,28 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
            this, &MainWindow::onFinished);
 
-    QWidget *contentWidget1 = new QWidget;
-    QVBoxLayout *contentLayout = new QVBoxLayout(contentWidget1);
+    ui->scrollArea->verticalScrollBar()->setStyleSheet(
+            "QScrollBar:vertical {"
+            "    background: transparent;"
+            "    border: none;"
+            "    width: 10px;"
+            "    margin: 0px 0px 0px 0px;"
+            "}"
+            "QScrollBar::handle:vertical {"
+            "    background: #171717;"
+            "    min-height: 20px;"
+            "}"
+            "QScrollBar::add-line:vertical {"
+            "    height: 0px;"
+            "}"
+            "QScrollBar::sub-line:vertical {"
+            "    height: 0px;"
+            "}"
+    );
 
+    ui->scrollArea->verticalScrollBar()->setStyle(new QCommonStyle);
 
-    for (int i = 1; i <= 20; ++i) {
-        QLabel *label = new QLabel(QString("Элемент %1").arg(i));
-        contentLayout->addWidget(label);
-        label->setStyleSheet("color: white");
-    }
-    contentWidget1->setLayout(contentLayout);
-
-    ui->scrollArea->setWidget(contentWidget1);
+    UpdateScrollBox();
 }
 
 MainWindow::~MainWindow() {
@@ -74,10 +86,82 @@ void MainWindow::onBuildClicked()
 
 void MainWindow::onUpdateClicked() {
 
-    FileScannerThread *scannerThread = new FileScannerThread(QStringList{"UnrealEditor.exe"});
-    scannerThread->start();
+    /*FileScannerThread *scannerThread = new FileScannerThread(QStringList{"UnrealEditor.exe"});
+    scannerThread->start();*/
+
+    Searher.loadConfig("search_config.json");
+
+    Searher.addIgnorePath("C:/Windows");
+    Searher.addIgnorePath("C:/Program Files");
+    Searher.addIgnorePath("C:/");
+
+    QObject::connect(&Searher, &FileSearcher::fileFound,
+                     [](const FileSearcher::FileResult& result) {
+                         qDebug() << "Found:" << result.filePath << "Size:" << result.fileSize;
+                     });
+
+    connect(&Searher, &FileSearcher::searchFinished,
+                     [this]() {
+                         qDebug() << "Search completed!";
+
+                         QMetaObject::invokeMethod(qApp, [this]() {
+
+                            UpdateScrollBox();
+
+                         }, Qt::QueuedConnection);
+
+                     });
+
+    Searher.searchFiles("uproject", true);
 }
 
+void MainWindow::UpdateScrollBox() {
+
+    QFile configFile("Configs/Config.json");
+    if (!configFile.open(QIODevice::ReadOnly)) return;
+    QJsonDocument Config = QJsonDocument::fromJson(configFile.readAll());
+
+    QJsonArray Array = Config["foundFiles"].toArray();
+
+    for (QJsonValue Value : Array) {
+
+        UProjects.append(UProject(Value["name"].toString()));
+
+    }
+
+    QWidget *contentWidget1 = new QWidget;
+    QVBoxLayout *contentLayout = new QVBoxLayout(contentWidget1);
+
+    contentLayout->setSpacing(0);
+
+    for (UProject Project : UProjects) {
+
+        CustomButton *button = new CustomButton(QString(Project.ProjectName + " UE%1").arg(Project.UEditorVersion));
+
+        button->setStyleSheet("color: white; background-color: #333;");
+
+        button->setMinimumHeight(50);
+
+        button->setMaximumWidth(176);
+
+        button->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Minimum);
+
+        contentLayout->addWidget(button);
+
+        qDebug() << "Slot executed in:" << QThread::currentThread() << " (main thread:"
+                 << QThread::currentThread()->isMainThread() << ")";
+        qDebug() << QString(Project.ProjectName + " UE%1").arg(Project.UEditorVersion);
+    }
+
+    contentLayout->setContentsMargins(0, 0, 0, 0);
+
+    contentWidget1->setLayout(contentLayout);
+
+    contentWidget1->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
+    contentWidget1->adjustSize();
+
+    ui->scrollArea->setWidget(contentWidget1);
+}
 
 void MainWindow::readOutput() {
 
@@ -107,4 +191,24 @@ void MainWindow::readError() {
 void MainWindow::onFinished(int exitCode, QProcess::ExitStatus exitStatus) {
     Q_UNUSED(exitCode)
     Q_UNUSED(exitStatus)
+}
+
+void MainWindow::executeInMainThread(std::function<void()> callback) {
+
+    QThread* currentThread = QThread::currentThread();
+    // Получаем главный поток приложения
+    QThread* mainThread = QCoreApplication::instance()->thread();
+
+    // Если мы не в главном потоке
+    if (currentThread != mainThread) {
+        // Создаем объект для выполнения в главном потоке
+        QObject* context = new QObject();
+        QMetaObject::invokeMethod(context, [context, callback]() {
+            callback();
+            context->deleteLater(); // Удаляем временный объект после выполнения
+        }, Qt::QueuedConnection);
+    } else {
+        // Если уже в главном потоке, просто выполняем
+        callback();
+    }
 }
