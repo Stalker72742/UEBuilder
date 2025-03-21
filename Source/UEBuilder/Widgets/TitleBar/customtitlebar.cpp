@@ -21,22 +21,26 @@ CustomTitleBar::CustomTitleBar(QWidget *parent) :
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
 
-    titleLabel = new QLabel("Custom Window Title", this);
+    titleLabel = new QLabel("UE builder", this);
     titleLabel->setStyleSheet("padding: 5px; color: white; background: transparent");
 
     QPushButton *CloseButton = new QPushButton("X", this);
 
-    QPushButton *minimizeButton = new QPushButton("🗕", this);
+    QPushButton *minimizeButton = new QPushButton("-", this);
 
-            ui->horizontalLayout->addWidget(titleLabel);
-            ui->horizontalLayout->addStretch();
-            ui->horizontalLayout->addWidget(minimizeButton);
-            ui->horizontalLayout->addWidget(CloseButton);
+    QString ButtonsStyleSheet = "background-color: transparent; width: 50; font-size: 25;";
 
-    CloseButton->setStyleSheet("color: #a8a8a8");
+    CloseButton->setStyleSheet(ButtonsStyleSheet);
+    minimizeButton->setStyleSheet(ButtonsStyleSheet);
+
+    ui->horizontalLayout->addWidget(titleLabel);
+    ui->horizontalLayout->addStretch();
+    ui->horizontalLayout->addWidget(minimizeButton);
+    ui->horizontalLayout->addWidget(CloseButton);
+
+    ui->frame->setStyleSheet("background-color: #202020; border: none");
 
     connect(CloseButton, &QPushButton::clicked, this, &CustomTitleBar::closeClicked);
-
 
     setFixedHeight(30);
     setStyleSheet("background-color: #2d2d2d;");

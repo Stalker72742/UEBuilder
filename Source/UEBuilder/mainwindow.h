@@ -28,6 +28,8 @@ public:
 
     void onUpdateClicked();
 
+    void onLaunchProject();
+
     void readOutput();
 
     void readError();
@@ -36,7 +38,7 @@ public:
 
     void executeInMainThread(std::function<void()> callback);
 
-    void OnProjectClicked();
+    //void OnProjectClicked();
 
 private:
 
@@ -49,6 +51,8 @@ private:
     FileSearcher Searher;
 
     QVector<UProject> UProjects;
+
+    UProject CurrentUProject;
 };
 
 class TransparentScrollBarStyle : public QProxyStyle {

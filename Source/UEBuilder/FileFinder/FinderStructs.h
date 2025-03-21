@@ -30,9 +30,9 @@ public:
         UEditorVersion = -1;
     }
 
-    explicit UProject(QString ProjectPath) {
+    explicit UProject(QString LProjectPath) {
 
-        ProjectPath = ProjectPath;
+        ProjectPath = LProjectPath;
 
         QFileInfo fileInfo(ProjectPath);
         ProjectName = fileInfo.fileName();
@@ -46,6 +46,8 @@ public:
             QJsonDocument doc = QJsonDocument::fromJson(projectFile.readAll());
             if (!doc.isNull() && doc.isObject()) {
                 QJsonObject obj = doc.object();
+
+                qDebug() << "Unreal version: " + obj["EngineAssociation"].toString();
 
                 if (obj.contains("EngineAssociation")) {
                     QString versionStr = obj["EngineAssociation"].toString();

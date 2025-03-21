@@ -40,6 +40,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(ui->Build, &QPushButton::clicked, this, &MainWindow::onBuildClicked);
     connect(ui->Update, &QPushButton::clicked, this, &MainWindow::onUpdateClicked);
+    connect(ui->LaunchProject, &QPushButton::clicked, this, &MainWindow::onLaunchProject);
+
     connect(process, &QProcess::readyReadStandardOutput, this, &MainWindow::readOutput);
     connect(process, &QProcess::readyReadStandardError, this, &MainWindow::readError);
     connect(process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
@@ -84,6 +86,27 @@ void MainWindow::onBuildClicked()
     process->start(program, arguments);
 }
 
+void MainWindow::onLaunchProject() {
+
+    QString Engine = "U:/Engines/UE_5.4/Engine/Binaries/Win64/UnrealEditor.exe";
+
+    QStringList Args = {CurrentUProject.ProjectPath};
+
+    qDebug() << CurrentUProject.UEditorPath;
+
+    return;
+
+    bool success = QProcess::startDetached(Engine, Args);
+
+    if (success) {
+        qDebug() << "Success";
+    } else {
+        qDebug() << "Error";
+    }
+
+    qDebug() << "Trying start project: " + CurrentUProject.ProjectPath;
+}
+
 void MainWindow::onUpdateClicked() {
 
     /*FileScannerThread *scannerThread = new FileScannerThread(QStringList{"UnrealEditor.exe"});
@@ -125,8 +148,12 @@ void MainWindow::UpdateScrollBox() {
 
     for (QJsonValue Value : Array) {
 
-        UProjects.append(UProject(Value["name"].toString()));
+        UProjects.append(UProject(Value["path"].toString()));
+    }
 
+    if (CurrentUProject.ProjectName == ""){
+
+        CurrentUProject = UProjects[1];
     }
 
     QWidget *contentWidget1 = new QWidget;
@@ -136,15 +163,17 @@ void MainWindow::UpdateScrollBox() {
 
     for (UProject Project : UProjects) {
 
-        CustomButton *button = new CustomButton(QString(Project.ProjectName + " UE%1").arg(Project.UEditorVersion));
+        CustomButton *button = new CustomButton(QString(Project.ProjectName + " UE%1").arg(Project.UEditorVersion).remove(".uproject"));
 
         button->setStyleSheet("color: white; background-color: #333;");
 
-        button->setMinimumHeight(50);
+        button->setMinimumHeight(90);
 
-        button->setMaximumWidth(176);
+        //button->setMaximumWidth(200);
 
-        button->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Minimum);
+        button->setFixedSize(200, 90);
+
+        button->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::MinimumExpanding);
 
         contentLayout->addWidget(button);
 

@@ -8,22 +8,24 @@
 #include "ui_CustomButton.h"
 #include <QPushButton>
 #include <QVBoxLayout>
+#include <QLabel>
 
 CustomButton::CustomButton(QString Text, QWidget *parent) :
         QWidget(parent), ui(new Ui::CustomButton) {
     ui->setupUi(this);
 
-    QPushButton *Button = new QPushButton(Text, this);
+    auto Label = new QLabel(Text);
+    Label->setWordWrap(true);
 
-    Button->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+    auto layout = new QHBoxLayout();
+    layout->addWidget(Label,0,Qt::AlignLeft);
 
-    QVBoxLayout *layout = new QVBoxLayout;
+    //ui->Button->setText(Text);
 
-    layout->addWidget(Button);
+    ui->Button->setLayout(layout);
 
-    setLayout(layout);
 
-    connect(Button, &QPushButton::clicked, this, &CustomButton::Clicked);
+    connect(ui->Button, &QPushButton::clicked, this, &CustomButton::Clicked);
 }
 
 CustomButton::~CustomButton() {
